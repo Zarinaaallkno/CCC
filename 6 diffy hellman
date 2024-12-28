@@ -1,0 +1,61 @@
+#include <iostream>
+#include <cstdlib>
+#include <cmath>
+#include <ctime>
+
+using namespace std;
+
+// Function to check if a number is prime.
+bool is_prime(int num) {
+    if (num <= 1) return false;
+    for (int i = 2; i <= sqrt(num); i++) {
+        if (num % i == 0) return false;
+    }
+    return true;
+}
+
+// Function to find a large prime number
+int find_large_prime() {
+    while (true) {
+        int prime_candidate = rand() % (900) + 100; // Random number between 100 and 1000
+        if (is_prime(prime_candidate)){
+            return prime_candidate;
+        }
+    }
+}
+
+int main() {
+    srand(time(NULL));
+
+    // Step 1: Choose a large prime number p and a generator g.
+    int p = find_large_prime();
+    int g = 2; // A common choice for g
+
+    // Step 2: Generate private keys for Alice and Bob.
+    int a_private = rand() % (p - 1) + 1; // Alice's private key
+    int b_private = rand() % (p - 1) + 1; // Bob's private key
+
+    // Step 3: Calculate public keys.
+    int A_public = static_cast<int>(pow(g, a_private)) % p; // Alice's public key
+    int B_public = static_cast<int>(pow(g, b_private)) % p; // Bob's public key
+
+    // Step 4: Generate the shared secret keys.
+    int shared_secret_alice = static_cast<int>(pow(B_public, a_private)) % p; // Alice's secret
+    int shared_secret_bob = static_cast<int>(pow(A_public, b_private)) % p;    // Bob's secret
+
+    // Output results
+    cout << "Prime p: " << p << endl;
+    cout << "Generator g: " << g << endl;
+    cout << "Alice's public key: " << A_public << endl;
+    cout << "Bob's public key: " << B_public << endl;
+    cout << "Alice's shared secret: " << shared_secret_alice << endl;
+    cout << "Bob's shared secret: " << shared_secret_bob << endl;
+
+    if (shared_secret_alice == shared_secret_bob) {
+        cout << "Key exchange successful, both share the same secret." << endl;
+    } else {
+        cout << "Key exchange failed!" << endl;
+    }
+
+    return 0;
+}
