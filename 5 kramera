@@ -1,0 +1,70 @@
+#include <iostream>
+#include <vector>
+#include <cmath>
+
+using namespace std;
+
+// Function to calculate the determinant of a matrix
+double determinant(const vector<vector<double>>& matrix) {
+    int n = matrix.size();
+    if (n == 1) return matrix[0][0];
+    if (n == 2) return matrix[0][0] * matrix[1][1] - matrix[0][1] * matrix[1][0];
+
+    double det = 0.0;
+    for (int c = 0; c < n; c++) {
+        vector<vector<double>> submatrix(n - 1, vector<double>(n - 1));
+        for (int i = 1; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                if (j < c) {
+                    submatrix[i - 1][j] = matrix[i][j];
+                } else if (j > c) {
+                    submatrix[i - 1][j - 1] = matrix[i][j];
+                }
+            }
+        }
+        det += pow(-1, c) * matrix[0][c] * determinant(submatrix);
+    }
+    return det;
+}
+
+// Function to solve the system using Cramer's rule
+vector<double> cramer(const vector<vector<double>>& A, const vector<double>& b) {
+    int n = b.size();
+    double det_A = determinant(A);
+
+    if (det_A == 0) {
+        return {};  // No unique solution exists
+    }
+
+    vector<double> x(n);
+    for (int i = 0; i < n; i++) {
+        vector<vector<double>> Ai = A;  // Create a copy of A
+        for (int j = 0; j < n; j++) {
+            Ai[j][i] = b[j];  // Replace the i-th column with b
+        }
+        x[i] = determinant(Ai) / det_A;
+    }
+
+    return x;
+}
+
+int main() {
+    // Example system of equations (same as Python example):
+    vector<vector<double>> A = {{1, 2, 3},
+                                 {2, 3, 1},
+                                 {3, 1, 2}};
+    vector<double> b = {9, 8, 7};
+
+    vector<double> solution = cramer(A, b);
+
+    if (!solution.empty()) {
+        cout << "Solution:" << endl;
+        for (int i = 0; i < solution.size(); ++i) {
+            cout << "x" << i + 1 << " = " << fixed << setprecision(2) << solution[i] << endl;
+        }
+    } else {
+        cout << "No unique solution exists." << endl;
+    }
+
+    return 0;
+}
